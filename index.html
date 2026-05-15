@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
+<meta name="screen-orientation" content="any">
 <meta name="theme-color" content="#0F2456">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SSWG Tasks">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="msapplication-TileImage" content="icon.png">
+<meta name="msapplication-TileColor" content="#0F2456">
+<link rel="shortcut icon" sizes="192x192" href="icon.png">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="shortcut icon" type="image/png" href="icon.png">
 <title>SSWG Tasks</title>
@@ -53,7 +57,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:14px;color:var(--text);min-height:100vh;background-color:#0F2456;background-image:radial-gradient(at 0% 0%,#1B3B8A 0px,transparent 50%),radial-gradient(at 100% 0%,#0D4F6B 0px,transparent 50%),radial-gradient(at 100% 100%,#1A1065 0px,transparent 50%),radial-gradient(at 0% 100%,#0E3D5C 0px,transparent 50%),radial-gradient(at 50% 50%,#162B6E 0px,transparent 70%);background-attachment:fixed;}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:14px;color:var(--text);min-height:100vh;background-color:#0F2456;background-image:radial-gradient(at 0% 0%,#1B3B8A 0px,transparent 50%),radial-gradient(at 100% 0%,#0D4F6B 0px,transparent 50%),radial-gradient(at 100% 100%,#1A1065 0px,transparent 50%),radial-gradient(at 0% 100%,#0E3D5C 0px,transparent 50%),radial-gradient(at 50% 50%,#162B6E 0px,transparent 70%);background-attachment:fixed;overscroll-behavior-y:contain;}
 .app{min-height:100vh;display:flex;flex-direction:column}
 
 /* ── TOPBAR ── */
@@ -103,7 +107,8 @@ tbody tr:hover td{background:#F5F8FF}
 .badge-pending{background:var(--slate-bg);color:var(--slate)}.badge-pending::before{background:var(--slate)}
 .badge-inprogress{background:var(--amber-bg);color:var(--amber)}.badge-inprogress::before{background:var(--amber)}
 .badge-done{background:var(--green-bg);color:var(--green)}.badge-done::before{background:var(--green)}
-.badge-delayed{background:var(--red-bg);color:var(--red)}.badge-delayed::before{background:var(--red)}
+.badge-delayedpending{background:var(--red-bg);color:var(--red)}.badge-delayedpending::before{background:var(--red)}
+.badge-delayedinprogress{background:#fff3cd;color:#856404}.badge-delayedinprogress::before{background:#f59e0b}
 .badge-awaiting{background:var(--blue-bg);color:var(--blue)}.badge-awaiting::before{background:var(--blue)}
 
 /* ── METRICS ── */
@@ -315,6 +320,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy2);box-shadow:0 0
             <option value="">— Select project —</option>
           </select>
           <button type="button" class="btn-icon" title="Add new project" onclick="toggleNewProjectInput()" style="width:34px;height:36px;border-radius:8px;font-size:20px;flex-shrink:0;border:1px solid #1E3A8A;color:#1E3A8A;background:#fff;">+</button>
+          <button type="button" class="btn-icon" title="Manage projects" onclick="window.tbManageProjects()" style="width:34px;height:36px;border-radius:8px;font-size:16px;flex-shrink:0;border:1px solid #dc2626;color:#dc2626;background:#fff;">🗑️</button>
         </div>
         <div id="new-project-row" style="display:none;margin-top:6px;">
           <input type="text" id="new-project-name-inp" placeholder="Type new project name and press Enter…" style="width:100%;" oninput="onNewProjectInput(this)" onkeydown="onNewProjectKey(event)">
@@ -323,18 +329,22 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy2);box-shadow:0 0
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Company Name</label>
+        <label>Category Name</label>
         <div style="display:flex;gap:6px;align-items:center;">
           <select id="task-company-inp" style="flex:1;" onchange="onCompanySelectChange(this)">
-            <option value="">— Select company —</option>
+            <option value="">— Select Category —</option>
           </select>
           <button type="button" class="btn-icon" title="Add new company" onclick="toggleNewCompanyInput()" style="width:34px;height:36px;border-radius:8px;font-size:20px;flex-shrink:0;border:1px solid #1E3A8A;color:#1E3A8A;background:#fff;">+</button>
+          <button type="button" class="btn-icon" title="Manage categories" onclick="window.tbManageCategories()" style="width:34px;height:36px;border-radius:8px;font-size:16px;flex-shrink:0;border:1px solid #dc2626;color:#dc2626;background:#fff;">🗑️</button>
         </div>
         <div id="new-company-row" style="display:none;margin-top:6px;">
           <input type="text" id="new-company-name-inp" placeholder="Type new company name and press Enter…" style="width:100%;" oninput="onNewCompanyInput(this)" onkeydown="onNewCompanyKey(event)">
         </div>
       </div>
-      <div class="form-group"><label>Deadline</label><input type="date" id="task-deadline"></div>
+      <div class="form-group"><label>Deadline</label>
+<input type="date" id="task-deadline" style="width:100%;margin-bottom:6px;">
+<input type="time" id="task-deadline-time" value="18:00" style="width:100%;">
+</div>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -464,6 +474,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy2);box-shadow:0 0
       </div>
       <div style="font-size:11px;color:#aaa;margin-top:5px;">Reminder will repeat until the task is marked done or you turn it off.</div>
     </div>
+    <div class="form-group">
+  <label>Active hours (reminder only rings during this time)</label>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <input type="time" id="reminder-start-time" value="09:00" style="flex:1;padding:8px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;">
+    <span style="color:#888;font-size:13px;">to</span>
+    <input type="time" id="reminder-end-time" value="18:00" style="flex:1;padding:8px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;">
+  </div>
+  <div style="font-size:11px;color:#aaa;margin-top:5px;">Reminder won't ring outside these hours.</div>
+</div>
+
     <!-- Ringtone fixed to Modern -->
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('reminder-modal')">Cancel</button>
@@ -498,7 +518,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy2);box-shadow:0 0
 
 <!-- Reassign Task Modal -->
 <div class="modal-overlay" id="reassign-modal">
-  <div class="modal" style="width:520px;max-width:96vw;">
+  <div class="modal" style="width:420px;max-width:90vw;max-height:90vh;overflow-y:auto;">
     <div class="modal-header">
       <div>
         <div class="modal-title" id="reassign-modal-title">Reassign task</div>
@@ -635,7 +655,14 @@ function fmtDL(dl){if(!dl)return'—';return dl.length>10?fmt(dl):dl;}
 function deadlineMs(dl){if(!dl)return null;if(dl.length<=10)return new Date(dl+'T23:59:59').getTime();return new Date(dl).getTime();}
 function completedAtMs(c){if(!c)return null;return new Date(c.approvedAt||c.timestamp).getTime();}
 function isLate(t,c){const d=deadlineMs(t.deadline);const done=completedAtMs(c);if(!d||!done)return false;return done>d;}
-function fmtShort(iso){const dt=new Date(iso);return dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}
+function fmtShort(iso){
+  const dt=new Date(iso);
+  const today=new Date();
+  const isToday=dt.toDateString()===today.toDateString();
+  const time=dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  if(isToday) return time;
+  return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' '+time;
+}
 function projName(pid){const p=state.projects.find(x=>x.id===pid);return p?p.name:'—';}
 function badge(cls,lbl){return '<span class="badge badge-'+cls+'">'+lbl+'</span>';}
 function fIcon(t){return{pdf:'📄',xlsx:'📊',image:'🖼️',video:'🎬'}[t]||'📎';}
@@ -667,28 +694,13 @@ function notifDot(n, size){
   return '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:'+size+'px;height:'+size+'px;border-radius:'+size+'px;background:#E24B4A;color:#fff;font-size:'+(size<=16?10:11)+'px;font-weight:700;padding:0 '+(n>9?4:0)+'px;line-height:1;flex-shrink:0;">'+n+'</span>';
 }
 
-// seed some demo unread: owner hasn't seen latest emp messages in a few chats
-// task 7: last owner message is index 1, emp replied at index 2 → owner hasn't read it
-// task 4: last owner message is index 1, emp replied at index 2 → owner hasn't read
-// task 5: last is emp at index 4 → owner hasn't read last 2 emp messages
-// employee hasn't read owner's last message in task 7 (index 1) or task 4 (index 1)
-(function seedUnread(){
-  state.unread={
-    1:{owner:3,emp:3},   // fully read both sides
-    7:{owner:1,emp:2},   // owner hasn't read Arjun's reply (index 2); emp has read owner's msg
-    4:{owner:1,emp:2},   // owner hasn't read Arjun's reply (index 2)
-    5:{owner:2,emp:3},   // owner hasn't read Priya's last 2 messages (index 3,4)
-    6:{owner:2,emp:2},   // owner hasn't read Vikram's reply (index 2)
-    3:{owner:3,emp:3},   // fully read
-  };
-})();
 function getTS(task){
   if(task.status==='Done') return 'done';
   if(task.status==='Awaiting Approval') return 'awaiting';
-  if(task.status==='In Progress') return task.deadline&&task.deadline<d(0)?'delayed':'inprogress';
-  return task.deadline&&task.deadline<d(0)?'delayed':'pending';
+  if(task.status==='In Progress') return task.deadline&&task.deadline<d(0)?'delayedinprogress':'inprogress';
+  return task.deadline&&task.deadline<d(0)?'delayedpending':'pending';
 }
-function sLabel(s){return{pending:'Pending',inprogress:'In Progress',done:'Done',delayed:'Delayed',awaiting:'Awaiting Approval'}[s]||s;}
+function sLabel(s){return{pending:'Pending',inprogress:'In Progress',done:'Done',delayed:'Delayed',delayedpending:'Delayed · Pending',delayedinprogress:'Delayed · In Progress',awaiting:'Awaiting Approval'}[s]||s;}
 
 // ── AUTH ──
 const AUTH_KEY='civilworks_session_v1';
@@ -804,7 +816,22 @@ function handleProfilePicChange(input){
 
 function saveProfilePic(){
   if(_pendingProfilePic!==null){
-    state.profilePics[state.currentUser]=_pendingProfilePic;
+    /* Compress image before saving */
+    var img=new Image();
+    img.onload=function(){
+      var canvas=document.createElement('canvas');
+      var max=200;
+      var w=img.width,h=img.height;
+      if(w>h){if(w>max){h=h*(max/w);w=max;}}else{if(h>max){w=w*(max/h);h=max;}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      state.profilePics[state.currentUser]=canvas.toDataURL('image/jpeg',0.7);
+      closeModal('profile-pic-modal');
+      renderTopbarUser();
+      if(typeof tbSaveMisc==='function')tbSaveMisc();
+    };
+    img.src=_pendingProfilePic;
+    return;
   }
   closeModal('profile-pic-modal');
   renderTopbarUser();
@@ -1165,14 +1192,15 @@ function renderOwner(){
   } else if(state.ownerTab==='tasks'){
     const EMPS=['All',...state.accounts.employees.filter(e=>!e.archived).map(e=>e.name)];
     const opts=EMPS.map(e=>'<option'+(e===state.filterEmployee?' selected':'')+'>'+e+'</option>').join('');
+
     // All tasks view excludes completed tasks — those live in the "Completed" tab
     const archivedNames=state.accounts.employees.filter(e=>e.archived).map(e=>e.name);
 const byEmp=state.tasks.filter(t=>t.status!=='Done').filter(t=>!archivedNames.includes(t.employee)).filter(t=>state.filterEmployee==='All'||t.employee===state.filterEmployee);
 
     const tot=byEmp.length;
-    const pen=byEmp.filter(t=>t.status==='Pending').length;
+    const pen=byEmp.filter(t=>getTS(t)==='pending').length;
     const inp=byEmp.filter(t=>t.status==='In Progress').length;
-    const del=byEmp.filter(t=>getTS(t)==='delayed').length;
+    const del=byEmp.filter(t=>getTS(t)==='delayedpending'||getTS(t)==='delayedinprogress').length;
     const awt=byEmp.filter(t=>t.status==='Awaiting Approval').length;
     const reass=byEmp.filter(t=>t.reassigned).length;
     const sf=state.filterStatus;
@@ -1203,8 +1231,12 @@ const byEmp=state.tasks.filter(t=>t.status!=='Done').filter(t=>!archivedNames.in
     const fil=byEmp
       .filter(t=>{
         if(state.filterTaskStar==='Starred') return t.starred;
+        if(state.filterStatus==='Delayed') return getTS(t)==='delayedpending'||getTS(t)==='delayedinprogress';
         if(state.filterStatus==='All') return true;
-        if(state.filterStatus==='Delayed') return getTS(t)==='delayed';
+        if(state.filterStatus==='DelayedPending') return getTS(t)==='delayedpending';
+        if(state.filterStatus==='DelayedInProgress') return getTS(t)==='delayedinprogress';
+        if(state.filterStatus==='Pending') return getTS(t)==='pending';
+        if(state.filterStatus==='In Progress') return getTS(t)==='inprogress';
         return t.status===state.filterStatus;
       })
       .filter(t=>{
@@ -1298,7 +1330,12 @@ const byEmp=state.tasks.filter(t=>t.status!=='Done').filter(t=>!archivedNames.in
             '<span class="chip" style="padding:2px 9px;font-size:12px;">'+fil.length+'</span>'+
           '</div>'+
           '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+
-            taskPill('All',tot,'All','neutral')+
+            (sf==='Delayed'||sf==='DelayedPending'||sf==='DelayedInProgress'?
+  '<div style="display:flex;gap:4px;">'+
+  taskPill('⬅ Pending',byEmp.filter(t=>getTS(t)==='delayedpending').length,'DelayedPending','danger')+
+  taskPill('⬅ In Progress',byEmp.filter(t=>getTS(t)==='delayedinprogress').length,'DelayedInProgress','warn')+
+  '</div>':'')+
+taskPill('All',tot,'All','neutral')+
             taskPill('Pending',pen,'Pending','neutral')+
             taskPill('In Progress',inp,'In Progress','warn')+
             taskPill('Awaiting',awt,'Awaiting Approval','info')+
@@ -1307,7 +1344,7 @@ const byEmp=state.tasks.filter(t=>t.status!=='Done').filter(t=>!archivedNames.in
             starPill+
           '</div>'+
         '</div>'+
-        '<div class="table-wrap"><table><thead><tr><th></th><th>Project</th><th>Company</th><th>Assigned to</th><th>Assigned on</th><th>Deadline</th><th>Status</th><th>Description</th><th style="text-align:right;"></th></tr></thead>'+
+        '<div class="table-wrap"><table><thead><tr><th></th><th>Project</th><th>Category</th><th>Assigned to</th><th>Assigned on</th><th>Deadline</th><th>Status</th><th>Description</th><th style="text-align:right;"></th></tr></thead>'+
         '<tbody>'+(rows||'<tr><td colspan="9" class="empty">'+emptyMsg+'</td></tr>')+'</tbody></table></div>'+
       '</div>';
   } else if(state.ownerTab==='completed'){
@@ -1334,7 +1371,7 @@ function fmtDateLabel(dateStr){
   const pretty=dt.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   let tag='';
   if(dateStr===yStr) tag=' · Yesterday';
-  else if(dateStr===tStr) tag=' · Today';
+else if(dateStr===tStr) tag=' · Today';
   return pretty+tag;
 }
 function fmtTime(iso){return new Date(iso).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}
@@ -1342,8 +1379,7 @@ function fmtTime(iso){return new Date(iso).toLocaleTimeString('en-IN',{hour:'2-d
 function renderSummary(){
   // Default to yesterday
   if(!state.summaryDate){
-    const y=new Date();y.setDate(y.getDate()-1);
-    state.summaryDate=y.toISOString().split('T')[0];
+    state.summaryDate=new Date().toISOString().split('T')[0];
   }
   const date=state.summaryDate;
   const today=new Date().toISOString().split('T')[0];
@@ -1402,7 +1438,6 @@ function renderSummary(){
         '<button class="btn btn-sm" onclick="setSummaryDate(\''+prevDate+'\')" title="Previous day">‹ Prev</button>'+
         '<input type="date" value="'+date+'" max="'+today+'" onchange="setSummaryDate(this.value)" style="padding:6px 10px;font-size:13px;width:auto;">'+
         '<button class="btn btn-sm" onclick="setSummaryDate(\''+nextDate+'\')"'+(canNext?'':' disabled style="opacity:.4;cursor:not-allowed;"')+' title="Next day">Next ›</button>'+
-        (date!==yStr?'<button class="btn btn-sm" onclick="setSummaryDate(\''+yStr+'\')">Yesterday</button>':'')+
       '</div>'+
     '</div>'+
     // Stat row
@@ -1754,7 +1789,7 @@ function renderEmployee(){
             '<input id="emp-completed-search" type="text" placeholder="Search completed…" value="'+esc(state.searchEmpCompleted)+'" oninput="setEmpCompletedSearch(this.value)" style="padding:7px 12px 7px 30px;border:1.5px solid #CBD5E1;border-radius:8px;font-size:13px;width:210px;font-family:inherit;outline:none;background:#fff;" onfocus="this.style.borderColor=\'#1B3B8A\'" onblur="this.style.borderColor=\'#CBD5E1\'">'+
           '</div>'+
         '</div>'+
-        '<div class="table-wrap"><table><thead><tr><th>Task</th><th>Project</th><th>Company</th><th>Deadline</th><th>Status</th><th>Approved on</th><th>Description</th></tr></thead>'+
+        '<div class="table-wrap"><table><thead><tr><th>Task</th><th>Project</th><th>Category</th><th>Deadline</th><th>Status</th><th>Approved on</th><th>Description</th></tr></thead>'+
         '<tbody>'+(rows||'<tr><td colspan="7" class="empty">'+(state.searchEmpCompleted?'No results for "'+esc(state.searchEmpCompleted)+'"':'No completed tasks yet.')+'</td></tr>')+'</tbody></table></div>'+
       '</div>';
   }
@@ -1840,7 +1875,7 @@ function renderEmployee(){
         (myStarredCount>0?'<div style="width:1px;height:22px;background:#e8e8e5;margin:0 2px;"></div>':'')+
         (myStarredCount>0?empPill('⭐ Starred by owner',myStarredCount,'Starred','neutral'):'')+
       '</div>'+
-      '<div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th>Project</th><th>Company</th><th>Deadline</th><th>Status</th><th>Description</th><th style="text-align:right;">Actions</th></tr></thead>'+
+      '<div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th>Project</th><th>Category</th><th>Deadline</th><th>Status</th><th>Description</th><th style="text-align:right;">Actions</th></tr></thead>'+
       '<tbody>'+(rows||'<tr><td colspan="6" class="empty">No '+(state.empStatusFilter==='All'?'active':state.empStatusFilter.toLowerCase())+' tasks.</td></tr>')+'</tbody></table></div>'+
     '</div>';
 }
@@ -2000,7 +2035,12 @@ function renderMsgs(c){
       '<div class="chat-sender">'+(own?'Owner':esc(m.sender))+'</div>'+
       (m.text?'<div class="chat-bubble">'+esc(m.text)+'</div>':'')+
       (attHtml?'<div class="chat-bubble" style="'+(own?'background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);':'background:#f5f5f3;border:1px solid #e8e8e5;')+'padding:8px 10px;border-radius:10px;">'+attHtml+'</div>':'')+
-      '<div class="chat-time">'+fmtShort(m.time)+'</div></div>';
+      '<div style="display:flex;align-items:center;gap:6px;margin-top:2px;">'+
+'<div class="chat-time">'+fmtShort(m.time)+'</div>'+
+(m.sender===state.currentUser||state.role==='owner'?
+  '<button onclick="window.tbEditMsg(\''+c.taskId+'\','+c.chat.indexOf(m)+')" style="background:none;border:none;cursor:pointer;font-size:11px;color:#aaa;padding:0;">✏️</button>'+
+  '<button onclick="window.tbDeleteMsg(\''+c.taskId+'\','+c.chat.indexOf(m)+')" style="background:none;border:none;cursor:pointer;font-size:11px;color:#aaa;padding:0;">🗑️</button>'
+:'')+'</div></div>';
   }).join('');
   el.scrollTop=el.scrollHeight;
 }
@@ -2025,9 +2065,11 @@ function sendMsg(){
   c.chat.push(msg); input.value='';
   // Mark as read for sender (they obviously read their own message)
   markRead(state.chatTaskId, state.role==='owner'?'owner':'emp');
+  if(typeof tbSaveMisc==='function')tbSaveMisc();
   renderMsgs(c);
   // Update badges in background without closing chat
-  render();
+ render();
+if(typeof tbSaveCompletions==='function')tbSaveCompletions();
 }
 
 function handleChatFile(input){
@@ -2104,7 +2146,11 @@ function setTab(t){state.ownerTab=t;render();}
 function setSearchCompleted(v){state.searchCompleted=v;const d=document.getElementById('completed-rows');if(d){renderCompletedRows();}else{render();}const el=document.getElementById('completed-search-inp');if(el){el.focus();el.setSelectionRange(v.length,v.length);}}
 function setCompletedEmployee(v){state.filterCompletedEmployee=v;render();}
 function setFilter(v){state.filterEmployee=v;state.filterStatus='All';state.filterTaskStar='All';render();}
-function setStatusFilter(v){state.filterStatus=v;state.filterTaskStar='All';render();}
+function setStatusFilter(v){
+  state.filterStatus=v;
+  state.filterTaskStar='All';
+  render();
+}
 function setProjFilter(v){state.filterProjectStatus=v;state.filterProjectStar='All';render();}
 function setProjStarFilter(v){state.filterProjectStar=v;state.filterProjectStatus='All';render();}
 function setTaskStarFilter(v){state.filterTaskStar=v;state.filterStatus='All';render();}
@@ -2114,7 +2160,7 @@ function setSearchProject(v){state.searchProject=v;render();const el=document.ge
 function setSearchTask(v){state.searchTask=v;render();const el=document.getElementById('task-search-inp');if(el){el.focus();el.setSelectionRange(v.length,v.length);}}
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-function updateTS(id,status){const t=state.tasks.find(x=>x.id===id);if(t){t.status=status;render();}}
+function updateTS(id,status){const t=state.tasks.find(x=>x.id===id);if(t){t.status=status;render();tbSaveTasks();}}
 
 /* ── REASSIGN TASKS ────────────────────────────────────────── */
 // Selected task IDs (owner bulk select)
@@ -2641,9 +2687,11 @@ function populateCompanySelect(selectedName){
   if(!sel) return;
   if(!state.customCompanies) state.customCompanies=[];
   const noneSelected=!selectedName;
-  sel.innerHTML='<option value="" disabled'+(noneSelected?' selected':'')+'>— Select company —</option>'+
+  sel.innerHTML='<option value="" disabled'+(noneSelected?' selected':'')+'>— Select category —</option>'+
     '<option value="None"'+(!noneSelected&&selectedName==='None'?' selected':'')+'>None</option>'+
     state.customCompanies.map(n=>'<option value="'+esc(n)+'"'+(n===selectedName?' selected':'')+'>'+esc(n)+'</option>').join('');
+  sel.style.maxHeight='200px';
+  sel.style.overflowY='auto';
   const row=document.getElementById('new-company-row');
   const inp=document.getElementById('new-company-name-inp');
   if(row) row.style.display='none';
@@ -2713,6 +2761,8 @@ function populateProjectSelect(selectedName){
   sel.innerHTML='<option value="" disabled'+(noneSelected?' selected':'')+'>— Select project —</option>'+
     '<option value="Other"'+(!noneSelected&&selectedName==='Other'?' selected':'')+'>Other</option>'+
     state.customProjects.map(n=>'<option value="'+esc(n)+'"'+(n===selectedName?' selected':'')+'>'+esc(n)+'</option>').join('');
+  sel.style.maxHeight='200px';
+  sel.style.overflowY='auto';
   const row=document.getElementById('new-project-row');
   const inp=document.getElementById('new-project-name-inp');
   if(row) row.style.display='none';
@@ -2829,6 +2879,9 @@ function openEditTask(id){
     dlVal=t.deadline.length<=10?t.deadline:t.deadline.slice(0,10);
   }
   document.getElementById('task-deadline').value=dlVal;
+if(t.deadline&&t.deadline.length>10){
+  document.getElementById('task-deadline-time').value=t.deadline.slice(11,16);
+}
   const assignedIso=t.assignedAt||t.createdAt||new Date().toISOString();
   document.getElementById('task-assigned-display').textContent=fmt(assignedIso);
   document.getElementById('task-assigned-display').dataset.iso=assignedIso;
@@ -2842,7 +2895,10 @@ function saveTask(){
   const employee=(document.getElementById('task-employee-inp').value||'').trim();
   const projectName=getSelectedProjectName();
   const company=getSelectedCompanyName();
-  const deadline=document.getElementById('task-deadline').value; // YYYY-MM-DD
+  const deadlineDate=document.getElementById('task-deadline').value;
+const deadlineTime=document.getElementById('task-deadline-time').value||'18:00';
+const deadline=deadlineDate?(deadlineDate+'T'+deadlineTime):'';
+  // YYYY-MM-DD
   const description=(document.getElementById('task-description').value||'').trim();
   if(!description){alert('Task description is required.');return;}
   if(!employee){alert('Please enter the employee name.');return;}
@@ -2890,9 +2946,11 @@ function openReminderModal(taskId){
   document.getElementById('reminder-custom-msg').value=existing&&existing.customMsg?existing.customMsg:'';
   document.getElementById('reminder-custom-group').style.display=(existing&&existing.type==='custom')?'block':'none';
   document.getElementById('reminder-interval').value=existing?String(existing.intervalMins):'60';
+  document.getElementById('reminder-start-time').value=existing&&existing.startTime?existing.startTime:'09:00';
+document.getElementById('reminder-end-time').value=existing&&existing.endTime?existing.endTime:'18:00';
   document.getElementById('reminder-custom-interval').style.display='none';
   document.getElementById('reminder-clear-btn').style.display=existing?'':'none';
-  
+
   openModal('reminder-modal');
 }
 
@@ -2926,11 +2984,22 @@ function saveReminder(){
   const timerId=setInterval(function(){
     const task=state.tasks.find(x=>x.id===_reminderEditTaskId);
     if(!task||task.status==='Done'||task.status==='Awaiting Approval'){clearInterval(timerId);delete state.reminders[_reminderEditTaskId];if(typeof tbSaveMisc==='function')tbSaveMisc();render();return;}
+    
     // Only fire if the current user is the assigned employee or owner
     const r=state.reminders[_reminderEditTaskId];
     if(!r) return;
+  
+
+    /* Check if current time is within active hours */
+var now=new Date();
+var hhmm=now.getHours()*100+now.getMinutes();
+var start=parseInt((r.startTime||'09:00').replace(':',''));
+var end=parseInt((r.endTime||'18:00').replace(':',''));
+if(hhmm<start||hhmm>end)return;
+  
     // Only ring for the assigned employee, not owner
 if(state.role==='owner') return;
+
 // Only ring if this is the right employee
 if(state.currentUser.replace(' (Owner)','')!==task.employee) return;
     const info=getReminderMessage(r.type,r.customMsg,task.name,task.employee);
@@ -2938,11 +3007,13 @@ if(state.currentUser.replace(' (Owner)','')!==task.employee) return;
     showReminderBanner(info.title,info.msg,r.intervalMins||1);
   },intervalMins*60*1000);
   const ringtone='modern';
-  state.reminders[_reminderEditTaskId]={type,customMsg,intervalMins,timerId,ringtone,setAt:new Date().toISOString()};
+  var startTime=document.getElementById('reminder-start-time').value||'09:00';
+var endTime=document.getElementById('reminder-end-time').value||'18:00';
+state.reminders[_reminderEditTaskId]={type,customMsg,intervalMins,timerId,ringtone,setAt:new Date().toISOString(),startTime,endTime};
   if(typeof tbSaveMisc==='function')tbSaveMisc();
   closeModal('reminder-modal');
   render();
-  // Fire immediately as preview
+  
   // Only fire for the assigned employee or owner
 /* Never show reminder preview to owner */
 if(state.role==='owner'){
@@ -3193,6 +3264,7 @@ document.addEventListener('keydown',function(e){
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
 <style>
 /* ── Login fields ── */
@@ -3297,10 +3369,16 @@ window.tbAuth=tbAuth;
 window.tbDb=tbDb;
 tbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){});
 
+/* Refresh auth token periodically */
+setInterval(function(){
+  var user=tbAuth.currentUser;
+  if(user)user.getIdToken(true).catch(function(){});
+},30*60*1000); /* refresh every 30 mins */
+
 console.log('TaskBridge: Firebase ready ✅');
 
 /* ══════════════════════════════════════════
-   CONSTANTS
+   CONSTANTSss
 ══════════════════════════════════════════ */
 var TB_OWNER_EMAIL='owner@taskbridge.internal';
 var TB_OWNER_PW='Moon$100';
@@ -3460,6 +3538,7 @@ function tbSyncStatus(s){
    FIRESTORE SYNC
 ══════════════════════════════════════════ */
 function tbSaveTasks(){
+  if(!state.loggedIn)return;
   tbSyncStatus('syncing');
   tbDb.doc('tb_appdata/tasks').set({
     tasks:state.tasks||[],nextTid:state.nextTid||1,
@@ -3467,6 +3546,7 @@ function tbSaveTasks(){
   }).then(function(){tbSyncStatus('synced');}).catch(function(){tbSyncStatus('offline');});
 }
 function tbSaveProjects(){
+  if(!state.loggedIn)return;
   tbDb.doc('tb_appdata/projects').set({
     projects:state.projects||[],nextPid:state.nextPid||1,
     customProjects:state.customProjects||[],customCompanies:state.customCompanies||[],
@@ -3474,17 +3554,21 @@ function tbSaveProjects(){
   }).catch(function(){});
 }
 function tbSaveCompletions(){
+  if(!state.loggedIn)return;
   tbDb.doc('tb_appdata/completions').set({
     completions:state.completions||[],
     updatedAt:firebase.firestore.FieldValue.serverTimestamp()
   }).catch(function(){});
 }
 function tbSaveMisc(){
+  if(!state.loggedIn)return;
   tbDb.doc('tb_appdata/misc').set({
     unread:state.unread||{},reminders:state.reminders||{},profilePics:state.profilePics||{},
     updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-  }).catch(function(){});
+  }).then(function(){console.log('Misc saved OK');})
+  .catch(function(e){console.log('Misc save FAILED:',e.message);});
 }
+  
 function tbLoadAll(cb){
   var done={t:false,p:false,c:false,m:false,a:false};
   function check(){if(done.t&&done.p&&done.c&&done.m&&done.a&&cb)cb();}
@@ -3591,7 +3675,9 @@ function tbShowAppWithSync(){
     tbStartListeners();tbSyncStatus('synced');
     if(typeof showApp==='function')showApp();
     setTimeout(tbStartReminderChecker, 3000);
-
+      });
+}
+  
     /* Start reminder checker for employees */
 function tbStartReminderChecker(){
   if(state.role==='owner')return;
@@ -3634,8 +3720,6 @@ setTimeout(function(){
     state.reminders[taskId].timerId=tid;
   });
 },2000);
-  });
-}
 
 window.doLogin=function(){
   if(tbIsLocked()){tbStartCD();return;}
@@ -3825,12 +3909,14 @@ window.tbShowHistory=function(){
 ══════════════════════════════════════════ */
 var _origSaveTask=window.saveTask;
 window.saveTask=function(){
+  if(!state.loggedIn)return;
   if(_origSaveTask)_origSaveTask.apply(this,arguments);
   tbSaveTasks();tbSaveProjects();tbSaveCompletions();
 };
 
 var _origPA=window.persistAccounts;
 window.persistAccounts=function(){
+  if(!state.loggedIn)return;
   if(_origPA)_origPA.apply(this,arguments);
   tbDb.doc('tb_appdata/accounts').set({
     employees:state.accounts.employees,
@@ -3843,14 +3929,16 @@ var _ltasks='',_lcomp='';
 var _rdebounce=null;
 window.render=function(){
   if(_origRender)_origRender.apply(this,arguments);
+  if(!state.loggedIn)return;
+  tbUpdateBadge();
+
+  /* Only save if user is logged in */
+  if(!state.loggedIn)return;
   var nt=JSON.stringify(state.tasks),nc=JSON.stringify(state.completions);
   if(nt!==_ltasks||nc!==_lcomp){
     _ltasks=nt;_lcomp=nc;
     clearTimeout(_rdebounce);
-    _rdebounce=setTimeout(function(){tbSaveTasks();tbSaveProjects();tbSaveCompletions();},10000);
-    if(tbAuth.currentUser){
-  _rdebounce=setTimeout(function(){tbSaveTasks();tbSaveProjects();tbSaveCompletions();},10000);
-}
+    _rdebounce=setTimeout(function(){tbSaveTasks();tbSaveProjects();tbSaveCompletions();},15000);
   }
 };
 
@@ -3870,6 +3958,7 @@ function tbDoLogout(e){
 }
 
 /* Override showLogin to clear fields */
+
 var _origShowLogin=window.showLogin;
 window.showLogin=function(){
   tbStopListeners();
@@ -3879,6 +3968,11 @@ window.showLogin=function(){
   var lb=document.getElementById('login-btn');
   if(lb){lb.disabled=false;lb.textContent='Sign in';}
   var dot=document.getElementById('tb-sync-dot');if(dot)dot.style.display='none';
+  /* Show login wrap directly */
+  var lw=document.getElementById('login-wrap');
+  if(lw)lw.style.display='flex';
+  var app=document.querySelector('.app');
+  if(app)app.style.display='none';
   if(_origShowLogin)_origShowLogin();
 };
 
@@ -4013,6 +4107,99 @@ window.tbDeleteTask=function(id){
   render();
 };
 
+window.tbDeleteMsg=function(taskId,idx){
+  if(!confirm('Delete this message?'))return;
+  var c=state.completions.find(function(x){return x.taskId==taskId;});
+  if(!c||!c.chat)return;
+  c.chat.splice(idx,1);
+  tbSaveCompletions();
+  var comp=state.completions.find(function(x){return x.taskId==state.chatTaskId;});
+  if(comp)renderMsgs(comp);
+};
+
+window.tbEditMsg=function(taskId,idx){
+  var c=state.completions.find(function(x){return x.taskId==taskId;});
+  if(!c||!c.chat)return;
+  var msg=c.chat[idx];
+  if(!msg)return;
+  var newText=prompt('Edit message:',msg.text||'');
+  if(newText===null)return;
+  msg.text=newText.trim();
+  msg.edited=true;
+  tbSaveCompletions();
+  var comp=state.completions.find(function(x){return x.taskId==state.chatTaskId;});
+  if(comp)renderMsgs(comp);
+};
+
+/* Delete project */
+window.tbDeleteProject=function(name){
+  if(!confirm('Delete project "'+name+'"?'))return;
+  state.customProjects=state.customProjects.filter(function(p){return p!==name;});
+  tbSaveProjects();
+  populateProjectSelect('');
+};
+
+/* Delete category */
+window.tbDeleteCategory=function(name){
+  if(!confirm('Delete category "'+name+'"?'))return;
+  state.customCompanies=state.customCompanies.filter(function(c){return c!==name;});
+  tbSaveProjects();
+  populateCompanySelect('');
+};
+
+window.tbManageProjects=function(){
+  if(!state.customProjects||!state.customProjects.length){
+    alert('No projects to manage.');return;
+  }
+  var list=state.customProjects.map(function(p,i){
+    return (i+1)+'. '+p;
+  }).join('\n');
+  var input=prompt('Projects:\n'+list+'\n\nType the exact project name to DELETE it:');
+  if(!input)return;
+  var found=state.customProjects.find(function(p){return p.toLowerCase()===input.trim().toLowerCase();});
+  if(!found){alert('Project not found!');return;}
+  if(!confirm('Delete "'+found+'"?'))return;
+  state.customProjects=state.customProjects.filter(function(p){return p!==found;});
+  tbSaveProjects();
+  populateProjectSelect('');
+  alert('✅ Deleted!');
+};
+
+window.tbManageCategories=function(){
+  if(!state.customCompanies||!state.customCompanies.length){
+    alert('No categories to manage.');return;
+  }
+  var list=state.customCompanies.map(function(c,i){
+    return (i+1)+'. '+c;
+  }).join('\n');
+  var input=prompt('Categories:\n'+list+'\n\nType the exact category name to DELETE it:');
+  if(!input)return;
+  var found=state.customCompanies.find(function(c){return c.toLowerCase()===input.trim().toLowerCase();});
+  if(!found){alert('Category not found!');return;}
+  if(!confirm('Delete "'+found+'"?'))return;
+  state.customCompanies=state.customCompanies.filter(function(c){return c!==found;});
+  tbSaveProjects();
+  populateCompanySelect('');
+  alert('✅ Deleted!');
+};
+
+/* Update app icon badge */
+function tbUpdateBadge(){
+  var count=0;
+  if(state.role==='owner'){
+    count=typeof totalUnreadForRole==='function'?totalUnreadForRole('owner'):0;
+  } else {
+    count=typeof totalUnreadForRole==='function'?totalUnreadForRole('emp'):0;
+  }
+  if('setAppBadge' in navigator){
+    if(count>0){
+      navigator.setAppBadge(count).catch(function(){});
+    } else {
+      navigator.clearAppBadge().catch(function(){});
+    }
+  }
+}
+
 console.log('TaskBridge: All systems ready ✅');
 
 </script>
@@ -4026,53 +4213,43 @@ console.log('TaskBridge: All systems ready ✅');
 console.log('TaskBridge Phase 3: File attachments starting...');
 
 /* ══════════════════════════════════════════
-   CLOUDINARY CONFIG
+   FIREBASE STORAGE CONFIG
 ══════════════════════════════════════════ */
-var TB_CLOUD='dqvj1w0bl';
-var TB_PRESET='taskapp_upload';
-var TB_CLOUD_URL='https://api.cloudinary.com/v1_1/'+TB_CLOUD+'/upload';
+var tbStorage=firebase.storage();
 
 /* ══════════════════════════════════════════
-   UPLOAD FILE TO CLOUDINARY
+   UPLOAD FILE TO FIREBASE STORAGE
 ══════════════════════════════════════════ */
 function tbUploadFile(file, onProgress){
   return new Promise(function(resolve, reject){
-    var formData=new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', TB_PRESET);
-    formData.append('folder', 'taskbridge');
+    var fileName=Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    var storageRef=tbStorage.ref('taskbridge/'+fileName);
+    var uploadTask=storageRef.put(file);
 
-    var xhr=new XMLHttpRequest();
-    xhr.open('POST', TB_CLOUD_URL, true);
-
-    if(onProgress){
-      xhr.upload.onprogress=function(e){
-        if(e.lengthComputable) onProgress(Math.round(e.loaded/e.total*100));
-      };
-    }
-
-    xhr.onload=function(){
-      if(xhr.status===200){
-        var res=JSON.parse(xhr.responseText);
-        resolve({
-          url: res.secure_url,
-          name: file.name,
-          type: file.type.startsWith('image/')?'image':
-                file.type.startsWith('video/')?'video':
-                file.name.endsWith('.pdf')?'pdf':
-                file.name.endsWith('.xlsx')||file.name.endsWith('.xls')?'xlsx':'file',
-          size: file.size,
-          publicId: res.public_id
+    uploadTask.on('state_changed',
+      function(snapshot){
+        if(onProgress){
+          var progress=Math.round(snapshot.bytesTransferred/snapshot.totalBytes*100);
+          onProgress(progress);
+        }
+      },
+      function(error){reject(new Error('Upload failed: '+error.message));},
+      function(){
+        uploadTask.snapshot.ref.getDownloadURL().then(function(url){
+          resolve({
+            url: url,
+            name: file.name,
+            type: file.type.startsWith('image/')?'image':
+                  file.type.startsWith('video/')?'video':
+                  file.name.endsWith('.pdf')?'pdf':
+                  file.name.endsWith('.xlsx')||file.name.endsWith('.xls')?'xlsx':'file',
+            size: file.size
+          });
         });
-      } else {
-        reject(new Error('Upload failed: '+xhr.status));
       }
-    };
-    xhr.onerror=function(){reject(new Error('Network error during upload'));};
-    xhr.send(formData);
+    );
   });
 }
-
 /* ══════════════════════════════════════════
    UPLOAD PROGRESS UI
 ══════════════════════════════════════════ */
@@ -4199,7 +4376,7 @@ if(typeof window.fIcon==='function'){
 /* ══════════════════════════════════════════
    PATCH CHAT RENDER TO USE REAL URLS
 ══════════════════════════════════════════ */
-/* We patch the render function to replace base64 with Cloudinary URLs */
+/* We patch the render function to replace base64 with Firebase Storage URLs */
 var _tbOrigRender3=window.render;
 window.render=function(){
   if(_tbOrigRender3)_tbOrigRender3.apply(this,arguments);
@@ -4257,7 +4434,7 @@ setTimeout(function(){
   });
 },1000);
 
-/* Override triggerAtt to support Cloudinary URLs */
+/* Override triggerAtt to support Firebase Storage URLs */
 var _origTriggerAtt=window.triggerAtt;
 window.triggerAtt=function(k){
   var a=attReg[k];if(!a)return;
@@ -4270,7 +4447,8 @@ window.triggerAtt=function(k){
     ov.innerHTML='<img src="'+url+'" style="max-width:90vw;max-height:70vh;border-radius:10px;object-fit:contain;">'+
       '<div style="display:flex;gap:10px;">'+
         '<a href="'+url+'" download="'+esc(a.name||'image')+'" style="padding:8px 18px;border-radius:8px;border:none;background:#1E3A8A;color:#fff;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none;">⬇ Save</a>'+
-        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:8px 18px;border-radius:8px;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:14px;cursor:pointer;font-family:inherit;">✕ Close</button>'+
+'<button onclick="if(navigator.share){navigator.share({title:\''+esc(a.name||'image')+'\',url:\''+url+'\'});}else{navigator.clipboard.writeText(\''+url+'\');alert(\'Link copied!\');}" style="padding:8px 18px;border-radius:8px;border:none;background:#16a34a;color:#fff;font-size:14px;cursor:pointer;font-family:inherit;">↗ Share</button>'+
+'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:8px 18px;border-radius:8px;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:14px;cursor:pointer;font-family:inherit;">✕ Close</button>'+
       '</div>';
     ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
     document.body.appendChild(ov);
@@ -4289,7 +4467,7 @@ document.body.appendChild(a2);a2.click();document.body.removeChild(a2);
   }
 };
 
-/* Override makeAttEl to support Cloudinary URLs */
+/* Override makeAttEl to support Firebase Storage URLs */
 var _origMakeAttEl=window.makeAttEl;
 window.makeAttEl=function(a,own){
   /* Use url if no dataUrl */
@@ -4300,7 +4478,7 @@ window.makeAttEl=function(a,own){
   return '';
 };
 
-console.log('TaskBridge Phase 3: Cloudinary ready ✅');
+console.log('TaskBridge Phase 3: Firebase Storage ready ✅');
 </script>
 <!--
 ================================================
