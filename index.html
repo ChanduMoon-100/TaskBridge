@@ -108,7 +108,7 @@ tbody tr:hover td{background:#F5F8FF}
 .badge-inprogress{background:var(--amber-bg);color:var(--amber)}.badge-inprogress::before{background:var(--amber)}
 .badge-done{background:var(--green-bg);color:var(--green)}.badge-done::before{background:var(--green)}
 .badge-delayedpending{background:var(--red-bg);color:var(--red)}.badge-delayedpending::before{background:var(--red)}
-.badge-delayedinprogress{background:#fff3cd;color:#856404}.badge-delayedinprogress::before{background:#f59e0b}
+.badge-delayedinprogress{background:var(--red-bg);color:var(--red)}.badge-delayedinprogress::before{background:var(--red)}
 .badge-awaiting{background:var(--blue-bg);color:var(--blue)}.badge-awaiting::before{background:var(--blue)}
 
 /* ── METRICS ── */
@@ -309,38 +309,40 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy2);box-shadow:0 0
 
 <!-- Task Modal -->
 <div class="modal-overlay" id="task-modal">
-  <div class="modal" style="max-width:560px;">
+  <div class="modal" style="max-width:680px;">
     <div class="modal-header"><div class="modal-title" id="task-modal-title">Create task</div><button class="modal-close" onclick="closeModal('task-modal')">✕</button></div>
     <div class="form-row">
       <div class="form-group"><label>Assign to</label><select id="task-employee-inp"></select></div>
       <div class="form-group">
-        <label>Project Name</label>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <select id="task-project-inp" style="flex:1;" onchange="onProjectSelectChange(this)">
-            <option value="">— Select project —</option>
-          </select>
-          <button type="button" class="btn-icon" title="Add new project" onclick="toggleNewProjectInput()" style="width:34px;height:36px;border-radius:8px;font-size:20px;flex-shrink:0;border:1px solid #1E3A8A;color:#1E3A8A;background:#fff;">+</button>
-          <button type="button" class="btn-icon" title="Manage projects" onclick="window.tbManageProjects()" style="width:34px;height:36px;border-radius:8px;font-size:16px;flex-shrink:0;border:1px solid #dc2626;color:#dc2626;background:#fff;">🗑️</button>
-        </div>
-        <div id="new-project-row" style="display:none;margin-top:6px;">
-          <input type="text" id="new-project-name-inp" placeholder="Type new project name and press Enter…" style="width:100%;" oninput="onNewProjectInput(this)" onkeydown="onNewProjectKey(event)">
-        </div>
-      </div>
+  <label>Project Name</label>
+  <div style="display:flex;gap:6px;align-items:center;">
+    <div style="position:relative;flex:1;">
+      <input type="text" id="task-project-search" placeholder="— Select or type project —" style="width:100%;padding:8px 11px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;font-family:inherit;" oninput="tbFilterProjects(this.value)" onfocus="tbShowProjectList()" autocomplete="off">
+      <div id="task-project-list" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid #e0e0e0;border-radius:8px;max-height:200px;overflow-y:auto;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.1);margin-top:2px;"></div>
+      <input type="hidden" id="task-project-inp">
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Category Name</label>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <select id="task-company-inp" style="flex:1;" onchange="onCompanySelectChange(this)">
-            <option value="">— Select Category —</option>
-          </select>
-          <button type="button" class="btn-icon" title="Add new company" onclick="toggleNewCompanyInput()" style="width:34px;height:36px;border-radius:8px;font-size:20px;flex-shrink:0;border:1px solid #1E3A8A;color:#1E3A8A;background:#fff;">+</button>
-          <button type="button" class="btn-icon" title="Manage categories" onclick="window.tbManageCategories()" style="width:34px;height:36px;border-radius:8px;font-size:16px;flex-shrink:0;border:1px solid #dc2626;color:#dc2626;background:#fff;">🗑️</button>
-        </div>
-        <div id="new-company-row" style="display:none;margin-top:6px;">
-          <input type="text" id="new-company-name-inp" placeholder="Type new company name and press Enter…" style="width:100%;" oninput="onNewCompanyInput(this)" onkeydown="onNewCompanyKey(event)">
-        </div>
-      </div>
+    <button type="button" onclick="toggleNewProjectInput()" style="width:34px;height:36px;border-radius:8px;font-size:20px;border:1px solid #1E3A8A;color:#1E3A8A;background:#fff;cursor:pointer;">+</button>
+    <button type="button" onclick="window.tbManageProjects()" style="width:34px;height:36px;border-radius:8px;font-size:16px;border:1px solid #dc2626;color:#dc2626;background:#fff;cursor:pointer;">🗑️</button>
+  </div>
+  <div id="new-project-row" style="display:none;margin-top:6px;">
+    <input type="text" id="new-project-name-inp" placeholder="Type new project name and press Enter..." style="width:100%;" oninput="onNewProjectInput(this)" onkeydown="onNewProjectKey(event)">
+  </div>
+</div>
+<div class="form-group">
+  <label>Category Name</label>
+  <div style="display:flex;gap:6px;align-items:center;">
+    <div style="position:relative;flex:1;">
+      <input type="text" id="task-company-search" placeholder="— Select or type category —" style="width:100%;padding:8px 11px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;font-family:inherit;" oninput="tbFilterCompanies(this.value)" onfocus="tbShowCompanyList()" autocomplete="off">
+      <div id="task-company-list" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid #e0e0e0;border-radius:8px;max-height:200px;overflow-y:auto;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.1);margin-top:2px;"></div>
+      <input type="hidden" id="task-company-inp">
+    </div>
+    <button type="button" onclick="toggleNewCompanyInput()" style="width:34px;height:36px;border-radius:8px;font-size:20px;border:1px solid #1E3A8A;color:#1E3A8A;background:#fff;cursor:pointer;">+</button>
+    <button type="button" onclick="window.tbManageCategories()" style="width:34px;height:36px;border-radius:8px;font-size:16px;border:1px solid #dc2626;color:#dc2626;background:#fff;cursor:pointer;">🗑️</button>
+  </div>
+  <div id="new-company-row" style="display:none;margin-top:6px;">
+    <input type="text" id="new-company-name-inp" placeholder="Type new category name and press Enter..." style="width:100%;" oninput="onNewCompanyInput(this)" onkeydown="onNewCompanyKey(event)">
+  </div>
+</div>
       <div class="form-group"><label>Deadline</label>
 <input type="date" id="task-deadline" style="width:100%;margin-bottom:6px;">
 <input type="time" id="task-deadline-time" value="18:00" style="width:100%;">
@@ -697,8 +699,11 @@ function notifDot(n, size){
 function getTS(task){
   if(task.status==='Done') return 'done';
   if(task.status==='Awaiting Approval') return 'awaiting';
-  if(task.status==='In Progress') return task.deadline&&task.deadline<d(0)?'delayedinprogress':'inprogress';
-  return task.deadline&&task.deadline<d(0)?'delayedpending':'pending';
+  var now=new Date();
+var dl=task.deadline?new Date(task.deadline):null;
+var isDelayed=dl&&now>dl;
+  if(task.status==='In Progress') return isDelayed?'delayedinprogress':'inprogress';
+  return isDelayed?'delayedpending':'pending';
 }
 function sLabel(s){return{pending:'Pending',inprogress:'In Progress',done:'Done',delayed:'Delayed',delayedpending:'Delayed · Pending',delayedinprogress:'Delayed · In Progress',awaiting:'Awaiting Approval'}[s]||s;}
 
@@ -1394,7 +1399,7 @@ function renderSummary(){
   // Submitted for approval on this date
   const submitted=state.completions.filter(c=>c.timestamp&&isSameDay(c.timestamp,date))
     .map(c=>{const t=state.tasks.find(x=>x.id===c.taskId);return{c,t};})
-    .filter(x=>x.t)
+    .filter(x=>x.t&&(x.t.status==='Awaiting Approval'||x.t.status==='Done'))
     .sort((a,b)=>new Date(b.c.timestamp)-new Date(a.c.timestamp));
 
   // New tasks created on this date
@@ -1411,7 +1416,7 @@ function renderSummary(){
     .sort((a,b)=>new Date(b.lastReassignedAt)-new Date(a.lastReassignedAt));
 
   // Delayed now (state of the world at time of viewing — not date-specific)
-  const delayedTasks=state.tasks.filter(t=>getTS(t)==='delayed')
+  const delayedTasks=state.tasks.filter(t=>getTS(t)==='delayedpending'||getTS(t)==='delayedinprogress')
     .sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
   // Reassigned — global count of tasks that have ever been reassigned
   const reassignedCount=state.tasks.filter(t=>t.reassigned).length;
@@ -1726,7 +1731,7 @@ function renderEmployee(){
   const pen=my.filter(t=>t.status==='Pending').length,
         inp=my.filter(t=>t.status==='In Progress').length,
         dn=doneTasks.length,
-        del=my.filter(t=>getTS(t)==='delayed').length;
+        del=my.filter(t=>getTS(t)==='delayedpending'||getTS(t)==='delayedinprogress').length;
 
   const awt=my.filter(t=>t.status==='Awaiting Approval').length;
   const reass=my.filter(t=>t.reassigned).length;
@@ -1808,7 +1813,11 @@ function renderEmployee(){
     state.empStatusFilter==='Starred'
       ? activeTasks.filter(t=>t.starred)
       : state.empStatusFilter==='Delayed'
-        ? activeTasks.filter(t=>getTS(t)==='delayed')
+        ? activeTasks.filter(t=>getTS(t)==='delayedpending'||getTS(t)==='delayedinprogress')
+        : state.empStatusFilter==='DelayedPending'
+        ? activeTasks.filter(t=>getTS(t)==='delayedpending')
+        : state.empStatusFilter==='DelayedInProgress'
+        ? activeTasks.filter(t=>getTS(t)==='delayedinprogress')
         : activeTasks.filter(t=>t.status===state.empStatusFilter);
   const filteredActive = (!state.searchEmpActive ? _activeByStatus : _activeByStatus.filter(t=>{
     const q=state.searchEmpActive.toLowerCase();
@@ -1872,6 +1881,10 @@ function renderEmployee(){
         empPill('In Progress',inp,'In Progress','warn')+
         empPill('Awaiting',awt,'Awaiting Approval','info')+
         empPill('Delayed',del,'Delayed','danger')+
+(state.empStatusFilter==='Delayed'||state.empStatusFilter==='DelayedPending'||state.empStatusFilter==='DelayedInProgress'?
+  empPill('Pending',activeTasks.filter(t=>getTS(t)==='delayedpending').length,'DelayedPending','danger')+
+  empPill('In Progress',activeTasks.filter(t=>getTS(t)==='delayedinprogress').length,'DelayedInProgress','warn')
+:'')+
         (myStarredCount>0?'<div style="width:1px;height:22px;background:#e8e8e5;margin:0 2px;"></div>':'')+
         (myStarredCount>0?empPill('⭐ Starred by owner',myStarredCount,'Starred','neutral'):'')+
       '</div>'+
@@ -2011,7 +2024,8 @@ function openChat(taskId){
   document.getElementById('chat-pending').innerHTML='';
   const role=state.role==='owner'?'owner':'emp';
   markRead(taskId, role);
-  renderMsgs(c);
+if(typeof tbSaveMisc==='function')tbSaveMisc();
+renderMsgs(c);
   openModal('chat-modal');
   setTimeout(()=>{const el=document.getElementById('chat-messages');if(el)el.scrollTop=el.scrollHeight;},60);
 }
@@ -2106,12 +2120,16 @@ function continueCurrent(){
   document.getElementById('chat-continue-btn').style.display='none';
   const c=state.completions.find(x=>x.taskId===state.chatTaskId);
   if(c){if(!c.chat)c.chat=[];c.chat.push({sender:'Owner',role:'owner',text:'↩ Task sent back to In Progress.',time:new Date().toISOString()});renderMsgs(c);}
+  tbSaveTasks();
+  tbSaveCompletions();
   render();
 }
 
 function approveTask(taskId){
   const t=state.tasks.find(x=>x.id===taskId); if(!t) return;
   t.status='Done'; const c=state.completions.find(x=>x.taskId===taskId); if(c) c.approvedAt=new Date().toISOString();
+  tbSaveTasks();
+  tbSaveCompletions();
   render();
 }
 
@@ -2126,11 +2144,9 @@ function shareAttachment(name, type){
 
 /* ── TASK COMPLETION (EMPLOYEE) ── */
 function openCompleteModal(taskId){
-  // Directly set status to Awaiting Approval and open chat — no popup needed
   const t=state.tasks.find(x=>x.id===taskId);
   if(!t) return;
   t.status='Awaiting Approval';
-  // Ensure a completion record exists (keep existing chat intact)
   let c=state.completions.find(x=>x.taskId===taskId);
   if(!c){
     c={taskId:t.id,employee:state.currentUser,note:'',timestamp:new Date().toISOString(),attachments:[],chat:[]};
@@ -2138,6 +2154,8 @@ function openCompleteModal(taskId){
   } else {
     c.timestamp=new Date().toISOString();
   }
+  tbSaveTasks();
+  tbSaveCompletions();
   render();
 }
 
@@ -2154,8 +2172,8 @@ function setStatusFilter(v){
 function setProjFilter(v){state.filterProjectStatus=v;state.filterProjectStar='All';render();}
 function setProjStarFilter(v){state.filterProjectStar=v;state.filterProjectStatus='All';render();}
 function setTaskStarFilter(v){state.filterTaskStar=v;state.filterStatus='All';render();}
-function toggleProjStar(id){const p=state.projects.find(x=>x.id===id);if(p){p.starred=!p.starred;render();}}
-function toggleTaskStar(id){const t=state.tasks.find(x=>x.id===id);if(t){t.starred=!t.starred;render();}}
+function toggleProjStar(id){const p=state.projects.find(x=>x.id===id);if(p){p.starred=!p.starred;tbSaveProjects();render();}}
+function toggleTaskStar(id){const t=state.tasks.find(x=>x.id===id);if(t){t.starred=!t.starred;tbSaveTasks();render();}}
 function setSearchProject(v){state.searchProject=v;render();const el=document.getElementById('proj-search');if(el){el.focus();el.setSelectionRange(v.length,v.length);}}
 function setSearchTask(v){state.searchTask=v;render();const el=document.getElementById('task-search-inp');if(el){el.focus();el.setSelectionRange(v.length,v.length);}}
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -2559,10 +2577,11 @@ function confirmReassign(){
   _reassignTargetEmployee = null;
   _reassignPoolScope = null;
   _reassignFilterEmp = null;
+  tbSaveTasks();
+  tbSaveCompletions();
   closeModal('reassign-modal');
   render();
 }
-
 // Hide reassign list dropdown when clicking outside
 document.addEventListener('click',function(e){
   const modal=document.getElementById('reassign-modal');
@@ -2572,7 +2591,7 @@ document.addEventListener('click',function(e){
 
 function openNewProject(){state.editingProject=null;document.getElementById('proj-modal-title').textContent='New project';['proj-name','proj-client'].forEach(id=>document.getElementById(id).value='');document.getElementById('proj-status').value='Active';openModal('project-modal');}
 function openEditProject(id){state.editingProject=id;const p=state.projects.find(x=>x.id===id);document.getElementById('proj-modal-title').textContent='Edit project';document.getElementById('proj-name').value=p.name;document.getElementById('proj-client').value=p.client;document.getElementById('proj-status').value=p.status;openModal('project-modal');}
-function saveProject(){const name=document.getElementById('proj-name').value.trim(),client=document.getElementById('proj-client').value.trim(),status=document.getElementById('proj-status').value;if(!name||!client){alert('Fill in project name and client.');return;}if(state.editingProject){const p=state.projects.find(x=>x.id===state.editingProject);p.name=name;p.client=client;p.status=status;}else state.projects.push({id:state.nextPid++,name,client,status,createdAt:new Date().toISOString()});closeModal('project-modal');render();}
+function saveProject(){const name=document.getElementById('proj-name').value.trim(),client=document.getElementById('proj-client').value.trim(),status=document.getElementById('proj-status').value;if(!name||!client){alert('Fill in project name and client.');return;}if(state.editingProject){const p=state.projects.find(x=>x.id===state.editingProject);p.name=name;p.client=client;p.status=status;}else state.projects.push({id:state.nextPid++,name,client,status,createdAt:new Date().toISOString()});tbSaveProjects();closeModal('project-modal');render();}
 function ensureCompletion(t){
   // Make sure every task has a completion/chat record so chat is available from the moment the task is created
   let c=state.completions.find(x=>x.taskId===t.id);
@@ -2730,6 +2749,7 @@ function onNewCompanyKey(e){
     if(!val) return;
     if(!state.customCompanies) state.customCompanies=[];
     if(!state.customCompanies.includes(val)) state.customCompanies.unshift(val);
+    tbSaveProjects();
     document.getElementById('new-company-row').style.display='none';
     document.getElementById('new-company-name-inp').value='';
     populateCompanySelect(val);
@@ -2745,11 +2765,7 @@ function onCompanySelectChange(sel){
   }
 }
 function getSelectedCompanyName(){
-  const sel=document.getElementById('task-company-inp');
-  if(!sel) return '';
-  const opt=sel.options[sel.selectedIndex];
-  if(!opt) return '';
-  return (opt.value||'').trim();
+  return (document.getElementById('task-company-inp').value||'').trim();
 }
 
 /* ── PROJECT DROPDOWN HELPERS ── */
@@ -2801,6 +2817,7 @@ function onNewProjectKey(e){
     if(!val) return;
     if(!state.customProjects) state.customProjects=[];
     if(!state.customProjects.includes(val)) state.customProjects.unshift(val);
+    tbSaveProjects();
     document.getElementById('new-project-row').style.display='none';
     document.getElementById('new-project-name-inp').value='';
     populateProjectSelect(val);
@@ -2816,11 +2833,7 @@ function onProjectSelectChange(sel){
   }
 }
 function getSelectedProjectName(){
-  const sel=document.getElementById('task-project-inp');
-  if(!sel) return '';
-  const opt=sel.options[sel.selectedIndex];
-  if(!opt) return '';
-  return (opt.value||'').trim();
+  return (document.getElementById('task-project-inp').value||'').trim();
 }
 
 function populateEmployeeSelect(selected){
@@ -3029,9 +3042,10 @@ function clearReminder(){
     clearInterval(state.reminders[_reminderEditTaskId].timerId);
   }
   delete state.reminders[_reminderEditTaskId];
+  if(typeof tbSaveMisc==='function')tbSaveMisc();
   closeModal('reminder-modal');
   render();
-}
+} 
 
 var _reminderDismissTimer=null;
 var _reminderCountdownTimer=null;
@@ -3622,7 +3636,16 @@ function tbStartListeners(){
   },function(){}));
   tbListeners.push(tbDb.doc('tb_appdata/completions').onSnapshot(function(s){
     if(!s.exists)return;
-    var d=s.data();if(d.completions){state.completions=d.completions;if(typeof render==='function')render();}
+    var d=s.data();
+    if(d.completions){
+      state.completions=d.completions;
+      if(typeof render==='function')render();
+      /* If chat is open, refresh messages */
+      if(state.chatTaskId){
+        var c=state.completions.find(function(x){return String(x.taskId)===String(state.chatTaskId);});
+        if(c&&typeof renderMsgs==='function')renderMsgs(c);
+      }
+    }
   },function(){}));
 }
 function tbStopListeners(){tbListeners.forEach(function(u){try{u();}catch(e){}});tbListeners=[];}
@@ -3679,17 +3702,52 @@ function tbShowAppWithSync(){
 }
   
     /* Start reminder checker for employees */
+
+var _tbDeadlineAlerted=JSON.parse(localStorage.getItem('tb_deadline_alerted')||'{}');
+var _tbApproachAlerted=JSON.parse(localStorage.getItem('tb_approach_alerted')||'{}');
 function tbStartReminderChecker(){
   if(state.role==='owner')return;
   setInterval(function(){
+    var now=new Date();
+    state.tasks.forEach(function(t){
+      if(t.employee!==state.currentUser)return;
+      if(t.status==='Done'||t.status==='Awaiting Approval')return;
+      if(!t.deadline)return;
+      var dl=new Date(t.deadline);
+      var diffMins=(dl-now)/1000/60;
+
+      /* 1 hour before deadline — ring once */
+      if(diffMins>0&&diffMins<=60&&!_tbApproachAlerted[t.id]){
+        _tbApproachAlerted[t.id]=true;
+        localStorage.setItem('tb_approach_alerted',JSON.stringify(_tbApproachAlerted));
+        showReminderBanner('⏰ Deadline in 1 Hour!','Your task "'+t.name+'" is due in less than 1 hour. Please complete it!',0.5);
+      }
+
+      /* Deadline passed — ring once */
+      var ts=getTS(t);
+      if((ts==='delayedpending'||ts==='delayedinprogress')&&!_tbDeadlineAlerted[t.id]){
+        _tbDeadlineAlerted[t.id]=true;
+        localStorage.setItem('tb_deadline_alerted',JSON.stringify(_tbDeadlineAlerted));
+        showReminderBanner('⚠️ Deadline Passed!','Your task "'+t.name+'" has passed its deadline. Please take action!',0.5);
+      }
+    });
+
+    /* Manual reminders from owner */
     Object.keys(state.reminders||{}).forEach(function(taskId){
       var r=state.reminders[taskId];
       if(!r||!r.setAt)return;
       var task=state.tasks.find(function(t){return String(t.id)===String(taskId);});
-      if(!task||task.status==='Done')return;
+      if(!task||task.status==='Done'||task.status==='Awaiting Approval')return;
       if(task.employee!==state.currentUser)return;
+
+      /* Check active hours */
+      var nowH=now.getHours()*100+now.getMinutes();
+      var start=parseInt((r.startTime||'09:00').replace(':',''));
+      var end=parseInt((r.endTime||'18:00').replace(':',''));
+      if(nowH<start||nowH>end)return;
+
       var setAt=new Date(r.setAt).getTime();
-      var elapsed=(Date.now()-setAt)/1000/60; /* minutes since set */
+      var elapsed=(Date.now()-setAt)/1000/60;
       var intervals=Math.floor(elapsed/r.intervalMins);
       var lastFired=r.lastFired||0;
       if(intervals>lastFired){
@@ -3698,7 +3756,7 @@ function tbStartReminderChecker(){
         showReminderBanner(info.title,info.msg,r.intervalMins);
       }
     });
-  },30000); /* check every 30 seconds */
+  },30000);
 }
     /* Restart reminders for current user */
 setTimeout(function(){
@@ -4199,6 +4257,90 @@ function tbUpdateBadge(){
     }
   }
 }
+
+window.tbFilterProjectSelect=function(q){
+  var sel=document.getElementById('task-project-inp');
+  if(!sel)return;
+  Array.from(sel.options).forEach(function(opt){
+    if(!q||opt.value===''||opt.value==='Other'){
+      opt.style.display='';
+    } else {
+      opt.style.display=opt.text.toLowerCase().includes(q.toLowerCase())?'':'none';
+    }
+  });
+};
+
+window.tbFilterCompanySelect=function(q){
+  var sel=document.getElementById('task-company-inp');
+  if(!sel)return;
+  Array.from(sel.options).forEach(function(opt){
+    if(!q||opt.value===''||opt.value==='None'){
+      opt.style.display='';
+    } else {
+      opt.style.display=opt.text.toLowerCase().includes(q.toLowerCase())?'':'none';
+    }
+  });
+};
+
+window.tbShowProjectList=function(){
+  var list=document.getElementById('task-project-list');
+  if(!list)return;
+  tbFilterProjects('');
+  list.style.display='block';
+};
+
+window.tbFilterProjects=function(q){
+  var list=document.getElementById('task-project-list');
+  if(!list)return;
+  var projects=['Other'].concat(state.customProjects||[]);
+  var filtered=q?projects.filter(function(p){return p.toLowerCase().includes(q.toLowerCase());}):projects;
+  list.innerHTML=filtered.map(function(p){
+    return '<div onclick="tbSelectProject(\''+esc(p)+'\')" style="padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background=\'#f5f5f3\'" onmouseout="this.style.background=\'\'">'+esc(p)+'</div>';
+  }).join('');
+  if(!filtered.length) list.innerHTML='<div style="padding:9px 12px;font-size:12px;color:#aaa;">No projects found</div>';
+  list.style.display='block';
+};
+
+window.tbSelectProject=function(name){
+  document.getElementById('task-project-inp').value=name;
+  document.getElementById('task-project-search').value=name;
+  document.getElementById('task-project-list').style.display='none';
+};
+
+window.tbShowCompanyList=function(){
+  var list=document.getElementById('task-company-list');
+  if(!list)return;
+  tbFilterCompanies('');
+  list.style.display='block';
+};
+
+window.tbFilterCompanies=function(q){
+  var list=document.getElementById('task-company-list');
+  if(!list)return;
+  var companies=['None'].concat(state.customCompanies||[]);
+  var filtered=q?companies.filter(function(c){return c.toLowerCase().includes(q.toLowerCase());}):companies;
+  list.innerHTML=filtered.map(function(c){
+    return '<div onclick="tbSelectCompany(\''+esc(c)+'\')" style="padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background=\'#f5f5f3\'" onmouseout="this.style.background=\'\'">'+esc(c)+'</div>';
+  }).join('');
+  if(!filtered.length) list.innerHTML='<div style="padding:9px 12px;font-size:12px;color:#aaa;">No categories found</div>';
+  list.style.display='block';
+};
+
+window.tbSelectCompany=function(name){
+  document.getElementById('task-company-inp').value=name;
+  document.getElementById('task-company-search').value=name;
+  document.getElementById('task-company-list').style.display='none';
+};
+
+/* Close dropdowns when clicking outside */
+document.addEventListener('click',function(e){
+  var pl=document.getElementById('task-project-list');
+  var ps=document.getElementById('task-project-search');
+  var cl=document.getElementById('task-company-list');
+  var cs=document.getElementById('task-company-search');
+  if(pl&&ps&&!pl.contains(e.target)&&e.target!==ps) pl.style.display='none';
+  if(cl&&cs&&!cl.contains(e.target)&&e.target!==cs) cl.style.display='none';
+});
 
 console.log('TaskBridge: All systems ready ✅');
 
