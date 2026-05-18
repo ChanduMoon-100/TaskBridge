@@ -3538,6 +3538,7 @@ function tbPwStr(v){
    SYNC STATUS
 ══════════════════════════════════════════ */
 function tbSyncStatus(s){
+  if(s==='offline')return;
   var dot=document.getElementById('tb-sync-dot');
   var ic=document.getElementById('tb-si');
   var tx=document.getElementById('tb-st');
@@ -3545,7 +3546,6 @@ function tbSyncStatus(s){
   dot.style.display='flex';
   if(s==='syncing'){ic.style.background='#f59e0b';tx.textContent='Syncing...';}
   else if(s==='synced'){ic.style.background='#22c55e';tx.textContent='Synced';}
-  else if(s==='offline'){ic.style.background='#ef4444';tx.textContent='Offline';}
 }
 
 /* ══════════════════════════════════════════
@@ -3553,6 +3553,7 @@ function tbSyncStatus(s){
 ══════════════════════════════════════════ */
 function tbSaveTasks(){
   if(!state.loggedIn)return;
+  if(!tbCheckOnline())return;
   tbSyncStatus('syncing');
   tbDb.doc('tb_appdata/tasks').set({
     tasks:state.tasks||[],nextTid:state.nextTid||1,
@@ -3561,6 +3562,7 @@ function tbSaveTasks(){
 }
 function tbSaveProjects(){
   if(!state.loggedIn)return;
+  if(!tbCheckOnline())return;
   tbDb.doc('tb_appdata/projects').set({
     projects:state.projects||[],nextPid:state.nextPid||1,
     customProjects:state.customProjects||[],customCompanies:state.customCompanies||[],
@@ -3569,6 +3571,7 @@ function tbSaveProjects(){
 }
 function tbSaveCompletions(){
   if(!state.loggedIn)return;
+  if(!tbCheckOnline())return;
   tbDb.doc('tb_appdata/completions').set({
     completions:state.completions||[],
     updatedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -3576,6 +3579,7 @@ function tbSaveCompletions(){
 }
 function tbSaveMisc(){
   if(!state.loggedIn)return;
+  if(!tbCheckOnline())return;
   tbDb.doc('tb_appdata/misc').set({
     unread:state.unread||{},reminders:state.reminders||{},profilePics:state.profilePics||{},
     updatedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -4341,6 +4345,60 @@ document.addEventListener('click',function(e){
   if(pl&&ps&&!pl.contains(e.target)&&e.target!==ps) pl.style.display='none';
   if(cl&&cs&&!cl.contains(e.target)&&e.target!==cs) cl.style.display='none';
 });
+
+/* ══════════════════════════════════════════
+   AUTO LOGOUT + INACTIVITY WARNING
+══════════════════════════════════════════ */
+var _tbInactiveTimer=null;
+var _tbWarningShown=false;
+
+(function(){
+  var div=document.createElement('div');
+  div.id='tb-inactive-warning';
+  div.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;align-items:center;justify-content:center;';
+  div.innerHTML='<div style="background:#fff;border-radius:16px;padding:32px 28px;max-width:360px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2);">'+
+    '<div style="font-size:32px;margin-bottom:12px;">⏰</div>'+
+    '<div style="font-size:17px;font-weight:700;color:#111;margin-bottom:8px;">Still there?</div>'+
+    '<div style="font-size:14px;color:#666;margin-bottom:20px;">You have been inactive for 10 minutes.<br>You will be logged out for security.</div>'+
+    '<button onclick="window.tbDoLogout()" style="width:100%;padding:12px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;">Logout</button>'+
+  '</div>';
+  document.body.appendChild(div);
+})();
+
+function tbShowInactiveWarning(){
+  var w=document.getElementById('tb-inactive-warning');
+  if(w){w.style.display='flex';_tbWarningShown=true;}
+  _tbInactiveTimer=setTimeout(function(){
+    tbHideInactiveWarning();
+    tbAuth.signOut().then(function(){
+      if(typeof showLogin==='function')showLogin();
+    });
+  },60*1000);
+}
+
+function tbHideInactiveWarning(){
+  var w=document.getElementById('tb-inactive-warning');
+  if(w){w.style.display='none';_tbWarningShown=false;}
+}
+
+function tbResetInactiveTimer(){
+  if(!state.loggedIn)return;
+  clearTimeout(_tbInactiveTimer);
+  tbHideInactiveWarning();
+  _tbInactiveTimer=setTimeout(tbShowInactiveWarning,10*60*1000);
+}
+
+['click','keydown','touchstart','scroll','mousemove'].forEach(function(ev){
+  document.addEventListener(ev,tbResetInactiveTimer,{passive:true});
+});
+
+function tbCheckOnline(){
+  if(!navigator.onLine){
+    alert('No internet connection! Please reconnect by Logging out before making changes.');
+    return false;
+  }
+  return true;
+}
 
 console.log('TaskBridge: All systems ready ✅');
 
