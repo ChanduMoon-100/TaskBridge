@@ -3631,9 +3631,24 @@ function tbLoadAll(cb){
 function tbStartListeners(){
   tbListeners.forEach(function(u){try{u();}catch(e){}});tbListeners=[];
   tbListeners.push(tbDb.doc('tb_appdata/tasks').onSnapshot(function(s){
-   if(!s.exists)return;
-    var d=s.data();if(d.tasks){state.tasks=d.tasks;if(d.nextTid)state.nextTid=d.nextTid;if(typeof render==='function')render();}
-  },function(){}));
+  if(!s.exists)return;
+  var d=s.data();
+  if(d.tasks){
+    state.tasks=d.tasks;
+    if(d.nextTid)state.nextTid=d.nextTid;
+    /* Stop reminders for completed/awaiting tasks */
+    Object.keys(state.reminders||{}).forEach(function(taskId){
+      var t=state.tasks.find(function(x){return String(x.id)===String(taskId);});
+      if(!t||t.status==='Done'||t.status==='Awaiting Approval'){
+        if(state.reminders[taskId]&&state.reminders[taskId].timerId){
+          clearInterval(state.reminders[taskId].timerId);
+        }
+        delete state.reminders[taskId];
+      }
+    });
+    if(typeof render==='function')render();
+  }
+},function(){}));
   tbListeners.push(tbDb.doc('tb_appdata/projects').onSnapshot(function(s){
     if(!s.exists)return;
     var d=s.data();if(d.projects){state.projects=d.projects;if(typeof render==='function')render();}
