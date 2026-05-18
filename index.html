@@ -4355,8 +4355,8 @@ var _tbWarningShown=false;
 (function(){
   var div=document.createElement('div');
   div.id='tb-inactive-warning';
-  div.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;align-items:center;justify-content:center;';
-  div.innerHTML='<div style="background:#fff;border-radius:16px;padding:32px 28px;max-width:360px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2);">'+
+  div.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;align-items:center;justify-content:center;pointer-events:all;';
+  div.innerHTML='<div style="background:#fff;border-radius:16px;padding:32px 28px;max-width:360px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2);pointer-events:all;" onclick="event.stopPropagation()">'+
     '<div style="font-size:32px;margin-bottom:12px;">⏰</div>'+
     '<div style="font-size:17px;font-weight:700;color:#111;margin-bottom:8px;">Still there?</div>'+
     '<div style="font-size:14px;color:#666;margin-bottom:20px;">You have been inactive for 10 minutes.<br>You will be logged out for security.</div>'+
@@ -4364,6 +4364,17 @@ var _tbWarningShown=false;
   '</div>';
   document.body.appendChild(div);
 })();
+
+window.tbDoLogout=function(){
+  tbHideInactiveWarning();
+  clearTimeout(_tbInactiveTimer);
+  state.loggedIn=false;
+  if(typeof clearSession==='function')clearSession();
+  tbStopListeners();
+  tbAuth.signOut().then(function(){
+    if(typeof showLogin==='function')showLogin();
+  });
+};
 
 function tbShowInactiveWarning(){
   var w=document.getElementById('tb-inactive-warning');
