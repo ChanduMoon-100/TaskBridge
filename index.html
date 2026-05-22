@@ -325,8 +325,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy2);box-shadow:0 0
     <button type="button" onclick="window.tbManageProjects()" style="width:34px;height:36px;border-radius:8px;font-size:16px;border:1px solid #dc2626;color:#dc2626;background:#fff;cursor:pointer;">🗑️</button>
   </div>
   <div id="new-project-row" style="display:none;margin-top:6px;">
-    <input type="text" id="new-project-name-inp" placeholder="Type new project name and press Enter..." style="width:100%;" oninput="onNewProjectInput(this)" onkeydown="onNewProjectKey(event)">
+  <div style="display:flex;gap:6px;">
+    <input type="text" id="new-project-name-inp" placeholder="Type new project name..." style="flex:1;" oninput="onNewProjectInput(this)" onkeydown="onNewProjectKey(event)" onkeyup="onNewProjectKey(event)">
+    <button type="button" onclick="onNewProjectKey({key:'Enter',preventDefault:function(){}})" style="padding:6px 12px;background:#1E3A8A;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;">Add</button>
   </div>
+</div>
 </div>
 <div class="form-group">
   <label>Category Name</label>
@@ -339,9 +342,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy2);box-shadow:0 0
     <button type="button" onclick="toggleNewCompanyInput()" style="width:34px;height:36px;border-radius:8px;font-size:20px;border:1px solid #1E3A8A;color:#1E3A8A;background:#fff;cursor:pointer;">+</button>
     <button type="button" onclick="window.tbManageCategories()" style="width:34px;height:36px;border-radius:8px;font-size:16px;border:1px solid #dc2626;color:#dc2626;background:#fff;cursor:pointer;">🗑️</button>
   </div>
-  <div id="new-company-row" style="display:none;margin-top:6px;">
-    <input type="text" id="new-company-name-inp" placeholder="Type new category name and press Enter..." style="width:100%;" oninput="onNewCompanyInput(this)" onkeydown="onNewCompanyKey(event)">
+<div id="new-company-row" style="display:none;margin-top:6px;">
+  <div style="display:flex;gap:6px;">
+    <input type="text" id="new-company-name-inp" placeholder="Type new category name..." style="flex:1;" oninput="onNewCompanyInput(this)" onkeydown="onNewCompanyKey(event)" onkeyup="onNewCompanyKey(event)">
+    <button type="button" onclick="onNewCompanyKey({key:'Enter',preventDefault:function(){}})" style="padding:6px 12px;background:#1E3A8A;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;">Add</button>
   </div>
+</div>
 </div>
       <div class="form-group"><label>Deadline</label>
 <input type="date" id="task-deadline" style="width:100%;margin-bottom:6px;">
@@ -2702,19 +2708,14 @@ function discardRestoredDraft(){
 
 /* ── COMPANY DROPDOWN HELPERS ── */
 function populateCompanySelect(selectedName){
-  const sel=document.getElementById('task-company-inp');
-  if(!sel) return;
-  if(!state.customCompanies) state.customCompanies=[];
-  const noneSelected=!selectedName;
-  sel.innerHTML='<option value="" disabled'+(noneSelected?' selected':'')+'>— Select category —</option>'+
-    '<option value="None"'+(!noneSelected&&selectedName==='None'?' selected':'')+'>None</option>'+
-    state.customCompanies.map(n=>'<option value="'+esc(n)+'"'+(n===selectedName?' selected':'')+'>'+esc(n)+'</option>').join('');
-  sel.style.maxHeight='200px';
-  sel.style.overflowY='auto';
-  const row=document.getElementById('new-company-row');
-  const inp=document.getElementById('new-company-name-inp');
-  if(row) row.style.display='none';
-  if(inp) inp.value='';
+  var search=document.getElementById('task-company-search');
+  var inp=document.getElementById('task-company-inp');
+  if(search&&selectedName)search.value=selectedName;
+  if(inp&&selectedName)inp.value=selectedName;
+  var row=document.getElementById('new-company-row');
+  var newInp=document.getElementById('new-company-name-inp');
+  if(row)row.style.display='none';
+  if(newInp)newInp.value='';
 }
 function toggleNewCompanyInput(){
   const row=document.getElementById('new-company-row');
@@ -2770,19 +2771,14 @@ function getSelectedCompanyName(){
 
 /* ── PROJECT DROPDOWN HELPERS ── */
 function populateProjectSelect(selectedName){
-  const sel=document.getElementById('task-project-inp');
-  if(!sel) return;
-  if(!state.customProjects) state.customProjects=[];
-  const noneSelected=!selectedName;
-  sel.innerHTML='<option value="" disabled'+(noneSelected?' selected':'')+'>— Select project —</option>'+
-    '<option value="Other"'+(!noneSelected&&selectedName==='Other'?' selected':'')+'>Other</option>'+
-    state.customProjects.map(n=>'<option value="'+esc(n)+'"'+(n===selectedName?' selected':'')+'>'+esc(n)+'</option>').join('');
-  sel.style.maxHeight='200px';
-  sel.style.overflowY='auto';
-  const row=document.getElementById('new-project-row');
-  const inp=document.getElementById('new-project-name-inp');
-  if(row) row.style.display='none';
-  if(inp) inp.value='';
+  var search=document.getElementById('task-project-search');
+  var inp=document.getElementById('task-project-inp');
+  if(search&&selectedName)search.value=selectedName;
+  if(inp&&selectedName)inp.value=selectedName;
+  var row=document.getElementById('new-project-row');
+  var newInp=document.getElementById('new-project-name-inp');
+  if(row)row.style.display='none';
+  if(newInp)newInp.value='';
 }
 function toggleNewProjectInput(){
   const row=document.getElementById('new-project-row');
@@ -2942,7 +2938,8 @@ const deadline=deadlineDate?(deadlineDate+'T'+deadlineTime):'';
     ensureCompletion(t);
     clearTaskDraft();
   }
-  closeModal('task-modal');
+  tbSaveProjects();
+ closeModal('task-modal');
   render();
 }
 
