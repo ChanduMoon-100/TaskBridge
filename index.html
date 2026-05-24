@@ -3237,22 +3237,6 @@ document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click
 // ── BOOTSTRAP: gate the app on login ──
 loadAccounts();
 (function boot(){
-  const s=loadSession();
-  if(s){
-    // resolve against accounts (names might have been edited)
-    if(s.kind==='owner'){
-  state.loggedIn=true;state.role='owner';state.currentUser=state.accounts.owner.name;
-  setTimeout(function(){if(typeof tbShowAppWithSync==='function')tbShowAppWithSync();else showApp();},100);return;
-}
-if(s.kind==='emp'){
-  const emp=state.accounts.employees.find(e=>e.name===s.name);
-  if(emp){
-    state.loggedIn=true;state.role='emp';state.currentUser=emp.name;
-    setTimeout(function(){if(typeof tbShowAppWithSync==='function')tbShowAppWithSync();else showApp();},100);return;
-  }
-}
- clearSession();
-  }
   showLogin();
 })();
 
@@ -3378,7 +3362,7 @@ var tbAuth=firebase.auth();
 var tbDb=firebase.firestore();
 window.tbAuth=tbAuth;
 window.tbDb=tbDb;
-tbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){});
+tbAuth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(function(){});
 
 /* Refresh auth token periodically */
 setInterval(function(){
@@ -3577,8 +3561,13 @@ function tbSaveCompletions(){
 function tbSaveMisc(){
   if(!state.loggedIn)return;
   if(!tbCheckOnline())return;
+  var remToSave={};
+  Object.keys(state.reminders||{}).forEach(function(k){
+    var r=state.reminders[k];
+    remToSave[k]={type:r.type,customMsg:r.customMsg,intervalMins:r.intervalMins,ringtone:r.ringtone,setAt:r.setAt,startTime:r.startTime,endTime:r.endTime,lastFired:r.lastFired||0};
+  });
   tbDb.doc('tb_appdata/misc').set({
-    unread:state.unread||{},reminders:state.reminders||{},profilePics:state.profilePics||{},
+    unread:state.unread||{},reminders:remToSave,profilePics:state.profilePics||{},
     updatedAt:firebase.firestore.FieldValue.serverTimestamp()
   }).then(function(){console.log('Misc saved OK');})
   .catch(function(e){console.log('Misc save FAILED:',e.message);});
@@ -3687,10 +3676,7 @@ function tbOnSuccess(cred,displayName,role){
   persistAccounts();
 }
   }
-  var remCb=document.getElementById('login-remember');
-  if(remCb&&remCb.checked&&typeof saveSession==='function'){
-    saveSession({kind:role==='owner'?'owner':'emp',name:displayName});
-  }
+  /* No session saving - Firebase SESSION persistence handles this */
   var lb=document.getElementById('login-btn');
   if(lb){lb.disabled=false;lb.textContent='Sign in';}
   tbDb.doc('tb_users/'+tbUID).get().then(function(snap){
@@ -4389,14 +4375,12 @@ window.tbDoLogout=function(){
 };
 
 function tbShowInactiveWarning(){
-  var w=document.getElementById('tb-inactive-warning');
-  if(w){w.style.display='flex';_tbWarningShown=true;}
-  _tbInactiveTimer=setTimeout(function(){
-    tbHideInactiveWarning();
-    tbAuth.signOut().then(function(){
-      if(typeof showLogin==='function')showLogin();
-    });
-  },60*1000);
+  state.loggedIn=false;
+  if(typeof clearSession==='function')clearSession();
+  tbStopListeners();
+  tbAuth.signOut().then(function(){
+    if(typeof showLogin==='function')showLogin();
+  });
 }
 
 function tbHideInactiveWarning(){
