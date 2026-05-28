@@ -3133,10 +3133,7 @@ function showReminderBanner(title,msg,intervalMins){
    _ringStop=false;
    /* If already ringing, queue this reminder */
 if(_ringCtx){
-  setTimeout(function(){
-    showReminderBanner(title,msg,intervalMins);
-  },35000); /* wait 35 secs then show next */
-  return;
+  stopRing();
 }
   const banner=document.getElementById('reminder-banner');
   document.getElementById('reminder-banner-title').textContent=title;
